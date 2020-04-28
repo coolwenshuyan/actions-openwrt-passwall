@@ -22,7 +22,7 @@ on:
     types: [started]
 
 env:
-  REPO_URL: https://github.com/Lienol/openwrt
+  REPO_URL: https://github.com/coolsnowwolf/lede
   REPO_BRANCH: dev-lean-lede
   CONFIG_FILE: .config
   DIY_SH: diy.sh
@@ -62,7 +62,11 @@ jobs:
         sudo -E apt-get -qq clean
 
     - name: Clone source code
-      run: git clone --depth 1 $REPO_URL -b $REPO_BRANCH openwrt
+#      run: git clone --depth 1 $REPO_URL -b $REPO_BRANCH openwrt
+      run: |
+        git clone https://github.com/coolsnowwolf/lede
+        cd lede
+        git checkout cc689609d63c6e8d22ea965be2c8bfcb38b860d2
 
     - name: Update feeds
       run: cd openwrt && ./scripts/feeds update -a
