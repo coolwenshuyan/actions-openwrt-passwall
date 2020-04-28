@@ -69,17 +69,17 @@ jobs:
         git checkout cc689609d63c6e8d22ea965be2c8bfcb38b860d2
 
     - name: Update feeds
-      run: cd openwrt && ./scripts/feeds update -a
+      run: cd lede && ./scripts/feeds update -a
 
     - name: Install feeds
-      run: cd openwrt && ./scripts/feeds install -a
+      run: cd lede && ./scripts/feeds install -a
 
     - name: Load custom configuration
       run: |
         [ -e files ] && mv files openwrt/files
         [ -e $CONFIG_FILE ] && mv $CONFIG_FILE openwrt/.config
         chmod +x $DIY_SH
-        cd openwrt
+        cd lede
         ../$DIY_SH
         make defconfig
 
@@ -90,7 +90,7 @@ jobs:
     - name: Download package
       id: package
       run: |
-        cd openwrt
+        cd lede
         make download -j8
         find dl -size -1024c -exec ls -l {} \;
         find dl -size -1024c -exec rm -f {} \;
@@ -98,7 +98,7 @@ jobs:
     - name: Compile the firmware
       id: compile
       run: |
-        cd openwrt
+        cd lede
         echo -e "$(nproc) thread compile"
         make -j$(nproc) || make -j1 V=s
         echo "::set-output name=status::success"
@@ -108,13 +108,13 @@ jobs:
       if: steps.compile.outputs.status == 'success' && env.UPLOAD_BIN_DIR == 'true'
       with:
         name: OpenWrt_directory
-        path: openwrt/bin
+        path: lede/bin
 
     - name: Organize files
       id: organize
       if: env.UPLOAD_FIRMWARE == 'true' && !cancelled()
       run: |
-        cd openwrt/bin/targets/*/*
+        cd lede/bin/targets/*/*
         rm -rf packages
         echo "::set-env name=FIRMWARE::$(pwd)"
         echo "::set-output name=status::success"
